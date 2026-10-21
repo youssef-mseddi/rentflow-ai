@@ -1,0 +1,4 @@
+qdrant-client>=1.19.0
+fastembed>=0.8.0
+cohere>=7.0.0
+openai>=1.0.0

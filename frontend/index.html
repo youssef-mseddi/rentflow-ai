@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoExpress - Voice & Text AI Assistant</title>
+  
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'%3E%3Cpath d='M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z'/%3E%3C/svg%3E" />
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-bg-primary"></div>
+  <div class="glow-bg-secondary"></div>
+
+  <div class="app-container">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 10.7 2 10.8 2 11v5c0 .6.4 1 1 1h2"></path>
+            <circle cx="7" cy="17" r="2"></circle>
+            <path d="M9 17h6"></path>
+            <circle cx="17" cy="17" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="title-row">
+            <h1>AutoExpress</h1>
+            <span class="badge-tag">AI Voice Suite</span>
+          </div>
+          <p class="subtitle">Agent Vocal Intelligent Multi-Agents</p>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <!-- Live Status Badge -->
+        <div id="statusBadge" class="status-badge status-ready">
+          <span class="status-dot"></span>
+          <span id="statusText" class="status-label">Prêt</span>
+        </div>
+
+        <!-- Session Badge -->
+        <div class="session-badge" title="Identifiant de session actif">
+          <span class="session-label">Session :</span>
+          <code id="sessionDisplay">...</code>
+          <button id="resetSessionBtn" class="session-refresh-btn" title="Générer une nouvelle session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="app-main">
+
+      <!-- Left / Top Column: Voice Interaction & Quick Actions -->
+      <section class="voice-section glass-panel">
+        <div class="panel-header">
+          <span class="panel-eyebrow">Interaction Vocale</span>
+          <h2 class="panel-title">Parlez à l'Assistant AutoExpress</h2>
+        </div>
+
+        <!-- Central Microphone Button & Pulse Waves -->
+        <div class="mic-stage">
+          <div id="pulseRing1" class="pulse-ring"></div>
+          <div id="pulseRing2" class="pulse-ring"></div>
+          <div id="pulseRing3" class="pulse-ring"></div>
+
+          <button id="recordBtn" class="mic-button" aria-label="Activer le microphone pour parler à l'agent">
+            <!-- Mic Icon (Idle) -->
+            <svg id="micIcon" class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="22"></line>
+            </svg>
+
+            <!-- Stop Icon (Active) -->
+            <svg id="stopIcon" class="mic-icon hidden" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Live Audio Waveform & Timer -->
+        <div class="recording-meta">
+          <div id="recordingTimer" class="recording-timer hidden">00:00</div>
+          
+          <div id="waveform" class="waveform-bars hidden">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </div>
+
+          <p id="micHelperText" class="mic-instruction">
+            Cliquez sur le micro pour parler, puis cliquez à nouveau pour envoyer.
+          </p>
+        </div>
+
+        <!-- Quick Actions Grid (4 Specialized Agents) -->
+        <div class="quick-actions-wrapper">
+          <div class="quick-actions-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>Raccourcis Démonstration (4 Agents Spécialisés)</span>
+          </div>
+
+          <div class="quick-actions-grid">
+            <!-- 1. Location -->
+            <button class="quick-btn" data-query="Combien coûte la location d'une 208 pour 3 jours avec l'assurance tous risques ?">
+              <div class="btn-top">
+                <span class="agent-tag tag-rental">Location</span>
+                <span class="btn-arrow">→</span>
+              </div>
+              <p class="btn-desc">Location 208 pour 3j avec assurance tous risques</p>
+            </button>
+
+            <!-- 2. Achat / Financement -->
+            <button class="quick-btn" data-query="Quel est le montant des mensualités pour une voiture à 12000 euros avec 2000 euros d'apport sur 48 mois ?">
+              <div class="btn-top">
+                <span class="agent-tag tag-sales">Achat & Crédit</span>
+                <span class="btn-arrow">→</span>
+              </div>
+              <p class="btn-desc">Calcul crédit auto 12 000€, 2 000€ apport sur 48 mois</p>
+            </button>
+
+            <!-- 3. Réservation -->
+            <button class="quick-btn" data-query="Je souhaite réserver une Clio pour 4 jours.">
+              <div class="btn-top">
+                <span class="agent-tag tag-booking">Réservation</span>
+                <span class="btn-arrow">→</span>
+              </div>
+              <p class="btn-desc">Demande de réservation Clio pour 4 jours</p>
+            </button>
+
+            <!-- 4. Support -->
+            <button class="quick-btn" data-query="Je suis en panne sur l'autoroute avec un voyant moteur allumé, envoyez une dépanneuse.">
+              <div class="btn-top">
+                <span class="agent-tag tag-support">Assistance 24/7</span>
+                <span class="btn-arrow">→</span>
+              </div>
+              <p class="btn-desc">Urgence panne autoroute, voyant moteur allumé</p>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right / Bottom Column: Conversation Feed & Text Input -->
+      <section class="chat-section glass-panel">
+        <div class="panel-header chat-header">
+          <div>
+            <span class="panel-eyebrow">Flux Multimodal</span>
+            <h2 class="panel-title">Échange en Direct</h2>
+          </div>
+          <button id="clearChatBtn" class="clear-chat-btn" title="Vider la conversation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Effacer</span>
+          </button>
+        </div>
+
+        <!-- Chat History Log -->
+        <div id="chatMessages" class="chat-messages custom-scrollbar">
+          <!-- Initial Assistant Message -->
+          <div class="message-wrapper assistant">
+            <div class="message-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 8V4H8"></path>
+                <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+                <path d="M2 14h2"></path>
+                <path d="M20 14h2"></path>
+                <path d="M15 13v2"></path>
+                <path d="M9 13v2"></path>
+              </svg>
+            </div>
+            <div class="message-bubble">
+              <div class="message-header">
+                <span class="message-sender">AutoExpress Assistant</span>
+                <span class="message-time">À l'instant</span>
+              </div>
+              <div class="message-content">
+                Bonjour ! Je suis l'assistant vocal d'AutoExpress. Je peux vous calculer un devis de location, simuler un crédit d'achat auto, enregistrer votre réservation ou déclencher l'assistance dépannage. Que puis-je faire pour vous aujourd'hui ?
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading / Typing Indicator -->
+        <div id="typingIndicator" class="typing-indicator hidden">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <span class="typing-text">L'agent IA réfléchit et synthétise sa réponse...</span>
+        </div>
+
+        <!-- Text Input Form -->
+        <form id="textForm" class="chat-input-bar">
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              id="textInput" 
+              placeholder="Écrivez votre message ou utilisez le microphone..." 
+              autocomplete="off"
+              required 
+            />
+          </div>
+          <button type="submit" id="sendBtn" class="send-btn" title="Envoyer le message">
+            <span>Envoyer</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>AutoExpress AI Voice Suite • Production n8n Cloud Orchestrator • Audio MP3 Base64 Streaming</p>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+      <span id="toastIcon" class="toast-icon">ℹ</span>
+      <span id="toastMessage" class="toast-message">Message</span>
+    </div>
+
+  </div>
+
+  <!-- Application Logic -->
+  <script src="app.js" defer></script>
+</body>
+</html>
